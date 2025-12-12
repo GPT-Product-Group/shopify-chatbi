@@ -30,6 +30,7 @@ export function ChatInterface() {
   const [status, setStatus] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
+  const hasData = lastData !== null && lastData !== undefined;
   const normalized = useMemo(() => normalizeRows(lastData), [lastData]);
 
   const handleSend = async () => {
@@ -257,7 +258,7 @@ export function ChatInterface() {
           </div>
         </section>
 
-        {lastData && (
+        {hasData && (
           <section className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm font-medium text-neutral-800">数据结果</div>
