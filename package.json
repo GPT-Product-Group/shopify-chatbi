@@ -9,9 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@prisma/client": "^5.22.0",
+    "@shopify/shopify-api": "^12.2.0",
+    "ai": "^5.0.112",
+    "better-sqlite3": "^12.5.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.4",
     "next": "16.0.10",
+    "papaparse": "^5.5.3",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "recharts": "^3.5.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -21,6 +31,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
