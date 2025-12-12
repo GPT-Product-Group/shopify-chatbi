@@ -4,11 +4,25 @@ import type { Message } from "@anthropic-ai/sdk/resources/messages";
 
 type MyMessage = { role: "user" | "assistant" | "system"; content: string };
 
+let anthropicClient: Anthropic | null = null;
+
+function getAnthropicClient() {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+        throw new Error("Missing ANTHROPIC_API_KEY environment variable");
+    }
+    if (!anthropicClient) {
+        anthropicClient = new Anthropic({ apiKey });
+    }
+    return anthropicClient;
+}
+
 export async function callClaude(
-    client: Anthropic,
     messages: MyMessage[],
     options?: { maxTokens?: number }
 ) {
+    const client = getAnthropicClient();
+
     const system = messages
         .filter(m => m.role === "system")
         .map(m => m.content)
