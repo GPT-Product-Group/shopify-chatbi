@@ -1,33 +1,34 @@
+// src/lib/claude.ts
 import Anthropic from "@anthropic-ai/sdk";
+import type { Message } from "@anthropic-ai/sdk/resources/messages";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-type ClaudeMessage = {
-  role: "user" | "assistant" | "system";
-  content: string;
-};
+type MyMessage = { role: "user" | "assistant" | "system"; content: string };
 
 export async function callClaude(
-  messages: ClaudeMessage[],
-  options?: { maxTokens?: number },
+    client: Anthropic,
+    messages: MyMessage[],
+    options?: { maxTokens?: number }
 ) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error("Missing ANTHROPIC_API_KEY");
-  }
+    const system = messages
+        .filter(m => m.role === "system")
+        .map(m => m.content)
+        .join("\n\n");
 
-  const completion = await anthropic.messages.create({
-    model: "claude-sonnet-4-5-20250929",
-    max_tokens: options?.maxTokens ?? 1024,
-    messages: messages.map(({ role, content }) => ({ role, content })),
-  });
+    const chatMessages = messages
+        .filter((m): m is { role: "user" | "assistant"; content: string } => m.role !== "system")
+        .map(({ role, content }) => ({ role, content }));
 
-  const text =
-    completion.content
-      .map((part) => ("text" in part ? part.text : ""))
-      .join("")
-      .trim() ?? "";
+    const resp = await client.messages.create({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: options?.maxTokens ?? 1024,
+        system: system || undefined,     // ✅ system 放这里
+        messages: chatMessages,          // ✅ 这里只能 user/assistant
+    });
 
-  return text;
+    const text = (resp.content as Message["content"])
+        .filter(c => c.type === "text")
+        .map(c => c.text)
+        .join("");
+
+    return text;
 }
