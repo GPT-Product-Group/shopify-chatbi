@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "3000:3000"
+      - "3300:3000"
     environment:
       NODE_ENV: production
       DATABASE_URL: "file:./data/chatbi.db"
@@ -12,7 +12,7 @@ services:
       SHOPIFY_API_SECRET: ${SHOPIFY_API_SECRET:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-changeme}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3300}
     volumes:
       - ./data:/app/data
     restart: unless-stopped
