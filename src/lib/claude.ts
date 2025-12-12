@@ -18,7 +18,7 @@ export async function callClaude(
   }
 
   const completion = await anthropic.messages.create({
-    model: "claude-3-5-sonnet-latest",
+    model: "claude-sonnet-4-5-20250929",
     max_tokens: options?.maxTokens ?? 1024,
     messages: messages.map(({ role, content }) => ({ role, content })),
   });
