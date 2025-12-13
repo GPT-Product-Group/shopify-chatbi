@@ -15,5 +15,8 @@ services:
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-changeme}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3300}
     volumes:
-      - ./data:/app/data
+      - data:/app/data
     restart: unless-stopped
+
+volumes:
+  data:
