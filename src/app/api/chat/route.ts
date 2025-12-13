@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
-import { getShopAccessToken, runShopifyQuery } from "@/lib/shopify";
+import {
+  getMissingScopes,
+  getRequiredScopes,
+  getShopAccessToken,
+  runShopifyQuery,
+} from "@/lib/shopify";
 import { callClaude } from "@/lib/claude";
 import { buildQueryPrompt } from "@/lib/prompts/text-to-graphql";
 
@@ -57,6 +62,34 @@ export async function POST(req: NextRequest) {
         error: "未找到店铺凭证，请先完成 Shopify 安装授权，或在请求中提供 accessToken。",
       }),
       { status: 401, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  try {
+    const missingScopes = await getMissingScopes(
+      body.shopDomain,
+      accessToken,
+      getRequiredScopes(),
+    );
+
+    if (missingScopes.length > 0) {
+      return new Response(
+        JSON.stringify({
+          error: `Shopify 应用缺少以下授权：${missingScopes.join(", ")}。请重新安装应用以授予这些 scope。`,
+          missingScopes,
+        }),
+        { status: 403, headers: { "Content-Type": "application/json" } },
+      );
+    }
+  } catch (err) {
+    return new Response(
+      JSON.stringify({
+        error:
+          err instanceof Error
+            ? err.message
+            : "无法校验 Shopify 授权 scope。",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 
