@@ -28,6 +28,7 @@ COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
+COPY --from=deps /app/node_modules ./node_modules
 # 预创建数据目录（挂载持久化卷）并确保应用用户有写权限
 RUN mkdir -p /app/data \
   && chown -R app:app /app/data
