@@ -5,7 +5,7 @@ WORKDIR /app
 # Install OpenSSL so Prisma's musl engine has the crypto libraries it requires.
 # Alpine 3.20 removed openssl1.1-compat, and Prisma now ships binaries that
 # target OpenSSL 3, so the default openssl package is sufficient.
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl su-exec
 
 FROM base AS deps
 RUN corepack enable
@@ -32,6 +32,10 @@ COPY --from=build /app/prisma ./prisma
 RUN mkdir -p /app/data \
   && chown -R app:app /app/data
 
-USER app
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+USER root
 EXPOSE 3300
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "server.js"]
