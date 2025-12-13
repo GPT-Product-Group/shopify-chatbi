@@ -2,9 +2,10 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-# Prisma's Linux musl engine currently expects OpenSSL 1.1; install compatibility
-# libraries so the generated client can load correctly in the runtime image.
-RUN apk add --no-cache openssl1.1-compat
+# Install OpenSSL so Prisma's musl engine has the crypto libraries it requires.
+# Alpine 3.20 removed openssl1.1-compat, and Prisma now ships binaries that
+# target OpenSSL 3, so the default openssl package is sufficient.
+RUN apk add --no-cache openssl
 
 FROM base AS deps
 RUN corepack enable
