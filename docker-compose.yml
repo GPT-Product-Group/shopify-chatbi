@@ -4,9 +4,10 @@ services:
   web:
     build: .
     ports:
-      - "3300:3000"
+      - "3300:3300"
     environment:
       NODE_ENV: production
+      PORT: 3300
       DATABASE_URL: "file:./data/chatbi.db"
       SHOPIFY_API_KEY: ${SHOPIFY_API_KEY:-}
       SHOPIFY_API_SECRET: ${SHOPIFY_API_SECRET:-}
