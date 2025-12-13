@@ -1,6 +1,16 @@
 import { prisma } from "./db";
 
 const API_VERSION = process.env.SHOPIFY_API_VERSION || "2024-10";
+const DEFAULT_SCOPES =
+  "read_orders,read_products,read_customers,read_inventory";
+
+export function getRequiredScopes() {
+  const scopes = process.env.SHOPIFY_SCOPES ?? DEFAULT_SCOPES;
+  return scopes
+    .split(",")
+    .map((scope) => scope.trim())
+    .filter(Boolean);
+}
 
 type GraphqlParams = {
   shop: string;
@@ -46,4 +56,33 @@ export async function getShopAccessToken(shopDomain: string) {
     select: { accessToken: true },
   });
   return shop?.accessToken ?? null;
+}
+
+export async function getMissingScopes(
+  shop: string,
+  accessToken: string,
+  requiredScopes = getRequiredScopes(),
+) {
+  const res = await fetch(
+    `https://${shop}/admin/oauth/access_scopes.json`,
+    {
+      headers: {
+        "X-Shopify-Access-Token": accessToken,
+      },
+    },
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(
+      `获取 Shopify 授权 scope 失败 (${res.status} ${res.statusText}): ${text}`,
+    );
+  }
+
+  const data = (await res.json()) as { access_scopes: { handle: string }[] };
+  const granted = new Set(
+    data.access_scopes.map((scope) => scope.handle.trim()).filter(Boolean),
+  );
+
+  return requiredScopes.filter((scope) => !granted.has(scope));
 }
