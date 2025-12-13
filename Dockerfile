@@ -2,6 +2,11 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
+# Install OpenSSL so Prisma's musl engine has the crypto libraries it requires.
+# Alpine 3.20 removed openssl1.1-compat, and Prisma now ships binaries that
+# target OpenSSL 3, so the default openssl package is sufficient.
+RUN apk add --no-cache openssl
+
 FROM base AS deps
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
