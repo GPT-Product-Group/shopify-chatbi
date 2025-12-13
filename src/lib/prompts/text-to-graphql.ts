@@ -7,7 +7,7 @@ export const SHOPIFY_SCHEMA_PROMPT = `
 - id, name, createdAt, processedAt
 - totalPriceSet { shopMoney { amount currencyCode } }
 - subtotalPriceSet { shopMoney { amount currencyCode } }
-- financialStatus, fulfillmentStatus, cancelReason
+- displayFinancialStatus, displayFulfillmentStatus, cancelReason
 - lineItems { edges { node { title quantity originalUnitPriceSet { shopMoney { amount } } } } }
 - customer { id displayName email totalSpent ordersCount }
 
