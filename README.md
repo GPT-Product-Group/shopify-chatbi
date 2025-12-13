@@ -1,36 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Shopify scope error：Access denied for orders
 
-## Getting Started
+When the app starts, you might see an error like:
 
-First, run the development server (it listens on port `3300` by default to avoid conflicts with other apps that use `3000`):
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+Shopify GraphQL errors: [{"message":"Access denied for orders field." ... "code":"ACCESS_DENIED"}]
 ```
 
-Open [http://localhost:3300](http://localhost:3300) with your browser to see the result.
+This means the app was installed without the `read_orders` scope, so Shopify blocks queries to `orders`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### How to fix
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Ensure the `SHOPIFY_SCOPES` environment variable includes `read_orders`. The default in [`src/app/api/auth/shopify/install/route.ts`](src/app/api/auth/shopify/install/route.ts) already sets
+   `"read_orders,read_products,read_customers,read_inventory"`, so most users only need to keep the default value.
+2. Reinstall the Shopify app after updating scopes. OAuth scopes are captured during installation, so simply changing the environment variable is not enough—you must reinstall to grant the new scope.
+3. Verify the app is connected to a store that allows reading orders (a development store or one where you have access to order data).
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+After reinstalling with the correct scopes, restart the dev server (default port `3300`) and the error should disappear.
