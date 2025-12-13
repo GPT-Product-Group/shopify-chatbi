@@ -34,9 +34,9 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "application/json" },
     });
   }
+  const accessTokenFromRequest = body.accessToken?.trim();
   const accessToken =
-    body.accessToken?.trim() ??
-    (await getShopAccessToken(body.shopDomain));
+    accessTokenFromRequest ?? (await getShopAccessToken(body.shopDomain));
   if (!accessToken) {
     return new Response(
       JSON.stringify({
@@ -85,8 +85,8 @@ export async function POST(req: NextRequest) {
       // 保存会话（先 upsert 店铺，再创建对话）
       const shop = await prisma.shop.upsert({
         where: { domain: body!.shopDomain },
-        update: { accessToken: body!.accessToken! },
-        create: { domain: body!.shopDomain, accessToken: body!.accessToken! },
+        update: accessTokenFromRequest ? { accessToken } : {},
+        create: { domain: body!.shopDomain, accessToken },
       });
 
       const conversationId =
