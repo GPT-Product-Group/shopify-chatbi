@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, run the development server (it listens on port `3300` by default to avoid conflicts with other apps that use `3000`):
 
 ```bash
 npm run dev

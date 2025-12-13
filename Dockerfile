@@ -15,6 +15,7 @@ RUN pnpm run build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3300
 RUN addgroup -S app && adduser -S app -G app
 
 # 复制 Next standalone 输出
@@ -26,5 +27,5 @@ COPY --from=build /app/prisma ./prisma
 RUN mkdir -p /app/data
 
 USER app
-EXPOSE 3000
+EXPOSE 3300
 CMD ["node", "server.js"]
