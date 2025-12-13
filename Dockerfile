@@ -2,6 +2,10 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
+# Prisma's Linux musl engine currently expects OpenSSL 1.1; install compatibility
+# libraries so the generated client can load correctly in the runtime image.
+RUN apk add --no-cache openssl1.1-compat
+
 FROM base AS deps
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
