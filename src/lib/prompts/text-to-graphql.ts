@@ -27,7 +27,7 @@ export const SHOPIFY_SCHEMA_PROMPT = `
 
 生成规则：
 - 只返回 GraphQL 查询字符串，不要多余解释。
-- 时间相关问题默认最近30天，可用 createdAt >= now - 30d。
+- 时间相关问题默认最近30天，使用 ISO8601 时间戳（如 2024-01-01T00:00:00Z），不要直接写 now - 30d。
 - 避免一次获取过多记录，使用 first: 50 作为默认上限。
 - 金额字段使用 shopMoney.amount。
 `;

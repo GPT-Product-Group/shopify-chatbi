@@ -19,15 +19,37 @@ type ChatRequest = {
 function sanitizeGraphqlQuery(raw: string) {
   const trimmed = raw.trim();
 
-  if (trimmed.startsWith("```")) {
-    const withoutFence = trimmed
-      .replace(/^```[a-zA-Z]*\s*/, "")
-      .replace(/\s*```$/, "");
+  const maybeUnfenced = (() => {
+    if (trimmed.startsWith("```") && trimmed.endsWith("```")) {
+      const withoutFence = trimmed
+        .replace(/^```[a-zA-Z]*\s*/, "")
+        .replace(/\s*```$/, "");
 
-    return withoutFence.trim();
-  }
+      return withoutFence.trim();
+    }
 
-  return trimmed;
+    return trimmed;
+  })();
+
+  // Replace relative time expressions like "created_at:>=now-30d" with a valid
+  // ISO8601 timestamp that Shopify accepts.
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  const relativePatterns: { regex: RegExp; replacement: string }[] = [
+    {
+      regex: /created_at\s*:\s*>=\s*(?:"|')?now\s*-\s*30d(?:"|')?/gi,
+      replacement: `created_at:>=${thirtyDaysAgo}`,
+    },
+    {
+      regex: /createdAt\s*:\s*>=\s*(?:"|')?now\s*-\s*30d(?:"|')?/g,
+      replacement: `createdAt:>=${thirtyDaysAgo}`,
+    },
+  ];
+
+  return relativePatterns.reduce(
+    (acc, { regex, replacement }) => acc.replace(regex, replacement),
+    maybeUnfenced,
+  );
 }
 
 export async function POST(req: NextRequest) {
