@@ -11,6 +11,20 @@ type ChatRequest = {
   conversationId?: string;
 };
 
+function sanitizeGraphqlQuery(raw: string) {
+  const trimmed = raw.trim();
+
+  if (trimmed.startsWith("```")) {
+    const withoutFence = trimmed
+      .replace(/^```[a-zA-Z]*\s*/, "")
+      .replace(/\s*```$/, "");
+
+    return withoutFence.trim();
+  }
+
+  return trimmed;
+}
+
 export async function POST(req: NextRequest) {
   let body: ChatRequest | null = null;
   try {
@@ -59,7 +73,8 @@ export async function POST(req: NextRequest) {
       await send({ type: "status", message: "正在生成查询..." });
 
       const queryPrompt = buildQueryPrompt(body!.message);
-      const graphql = await callClaude(queryPrompt, { maxTokens: 500 });
+      const rawGraphql = await callClaude(queryPrompt, { maxTokens: 500 });
+      const graphql = sanitizeGraphqlQuery(rawGraphql);
       await send({ type: "query", query: graphql });
 
       await send({ type: "status", message: "正在调用 Shopify..." });
