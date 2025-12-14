@@ -1,0 +1,2 @@
+# This file ensures that migration history is consistent across environments.
+provider = "sqlite"

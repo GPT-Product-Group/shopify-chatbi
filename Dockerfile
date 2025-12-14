@@ -21,6 +21,9 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3300
+ENV DATABASE_URL=file:/app/data/chatbi.db
+ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+RUN corepack enable
 RUN addgroup -S app && adduser -S app -G app
 
 # 复制 Next standalone 输出
@@ -28,6 +31,7 @@ COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
+COPY --from=deps /app/node_modules ./node_modules
 # 预创建数据目录（挂载持久化卷）并确保应用用户有写权限
 RUN mkdir -p /app/data \
   && chown -R app:app /app/data
